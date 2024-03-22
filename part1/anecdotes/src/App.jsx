@@ -6,6 +6,32 @@ const Button = (props) => (
   </button>
 )
 
+const DisplayMostVotedAnecdote = (props) => {
+
+  let maxVotes = Math.max(...props.points)
+
+  if (maxVotes === 0) {
+    return (
+      <div>
+        No Votes Yet.
+      </div>
+    )
+  }
+  
+  let mostVotedIndex = -1;
+  for (let i = 0; i < props.points.length; i++) {
+    if (props.points[i] === maxVotes) {
+      mostVotedIndex = i;
+      break;
+    }
+  }
+
+  return (
+    props.anecdotes[mostVotedIndex]
+  )
+
+}
+
 function getRandomInt(max) {
   return Math.floor(Math.random() * max)
 }
@@ -22,18 +48,34 @@ const App = () => {
     'The only way to go fast, is to go well.'
   ]
    
+  const voteTemplate = [0, 0, 0, 0, 0, 0, 0, 0]
+
   const [selected, setSelected] = useState(0)
+  const [points, setPoints] = useState(voteTemplate)
 
   const handleSelection = () => {
     setSelected(getRandomInt(7))
   }
 
+  const handleVote = () => {
+    setPoints(prevPoints => {
+      const newPoints = [...prevPoints];
+      newPoints[selected] += 1;
+      return newPoints;
+    });
+  }
+
   return (
     <div>
-      {anecdotes[selected]}
+      <div><span style={{ fontWeight: 'bold', fontSize: 30 }}>Anecdote of the Day</span></div>
+      <div>{anecdotes[selected]}</div>
+      <div>has {points[selected]} votes</div>
       <div>
+      <Button handleClick={handleVote} text='vote' />
       <Button handleClick={handleSelection} text='next anecdote' />
       </div>
+      <div><span style={{ fontWeight: 'bold', fontSize: 30 }}>Anecdote With Most Votes</span></div>
+      <DisplayMostVotedAnecdote points={points} anecdotes={anecdotes} />
     </div>
   )
 }
